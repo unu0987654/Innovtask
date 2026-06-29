@@ -1,5 +1,0 @@
-flask
-flask-cors
-cryptography
-gunicorn
-psycopg2-binary

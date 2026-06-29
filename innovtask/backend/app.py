@@ -42,6 +42,18 @@ except Exception as _e:
     print("Aviso: init_db al importar fallo:", _e)
 
 
+@app.route("/setup")
+def _setup():
+    """Ruta temporal de diagnostico: crea las tablas y siembra usuarios.
+    Si algo falla, muestra el error exacto en pantalla. Borrar despues de usar."""
+    import traceback
+    try:
+        db.init_db()
+        return "OK: base inicializada. Tablas creadas y usuarios sembrados. Ya puedes iniciar sesion.", 200
+    except Exception as e:
+        return "ERROR al inicializar la base:\n\n" + traceback.format_exc(), 500
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

@@ -181,14 +181,15 @@ def init_db():
             created_at TEXT
         )""")
     c.commit()
-    # Migracion: anadir columnas de hora si la BD es vieja (tolerante en ambos motores)
-    for col in ("start_time", "end_time"):
-        try:
-            cur.execute(f"ALTER TABLE tasks ADD COLUMN {col} TEXT")
-            c.commit()
-        except Exception:
+    # Migracion: anadir columnas de hora si la BD es vieja.
+    # Solo aplica en SQLite (bases viejas en la PC). En Postgres las tablas
+    # ya nacen completas con CREATE TABLE, asi que no se intenta el ALTER
+    # (un ALTER fallido abortaria la transaccion y se perderian las tablas).
+    if not USE_PG:
+        for col in ("start_time", "end_time"):
             try:
-                c.rollback()  # Postgres deja la transaccion abortada tras un error
+                cur.execute(f"ALTER TABLE tasks ADD COLUMN {col} TEXT")
+                c.commit()
             except Exception:
                 pass  # ya existe la columna
     _seed_users(c)
